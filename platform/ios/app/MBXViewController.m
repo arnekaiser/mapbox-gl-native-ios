@@ -319,6 +319,8 @@ CLLocationCoordinate2D randomWorldCoordinate() {
         [self.mapView unsubscribeForObserver:self.testObserver];
         self.testObserver = nil;
     });
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    self.mapView.contentInset = UIEdgeInsetsMake(15, 10, 10, 10);
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations
@@ -733,9 +735,24 @@ CLLocationCoordinate2D randomWorldCoordinate() {
                     }
                     _contentInsetsEnabled = !_contentInsetsEnabled;
                     self.automaticallyAdjustsScrollViewInsets = !_contentInsetsEnabled;
+                    
+                    UIEdgeInsets safeInsets = UIEdgeInsetsZero;
+                    CGSize safeSize = CGSizeZero;
+                    if (@available(iOS 11.0, *)) {
+                        safeInsets = self.mapView.safeAreaInsets;
+                    } else {
+                        safeInsets.top = self.topLayoutGuide.length;
+                        CGFloat bottomPoint = CGRectGetMaxY(self.mapView.bounds) -
+                                                (CGRectGetMaxY(self.mapView.bounds)
+                                                - self.bottomLayoutGuide.length);
+                        safeInsets.bottom = bottomPoint;
+                    }
+                    CGSize currentSize = self.mapView.frame.size;
+                    safeSize = CGSizeMake(currentSize.width - safeInsets.left - safeInsets.right,
+                                          currentSize.height - safeInsets.top - safeInsets.bottom);
                     UIEdgeInsets contentInsets = self.mapView.bounds.size.width > self.mapView.bounds.size.height
                         ? UIEdgeInsetsMake(_originalContentInsets.top, 0.5 * self.mapView.bounds.size.width, _originalContentInsets.bottom, 0.0)
-                        : UIEdgeInsetsMake(0.25 * self.mapView.bounds.size.height, 0.0, _originalContentInsets.bottom, 0.25 * self.mapView.bounds.size.width);
+                        : UIEdgeInsetsMake(0.25 * safeSize.height, 0.0, _originalContentInsets.bottom, 0.25 * safeSize.width);
                     if (_contentInsetsEnabled) {
                         if (!self.contentInsetsOverlays)
                             self.contentInsetsOverlays = [NSMutableArray array];

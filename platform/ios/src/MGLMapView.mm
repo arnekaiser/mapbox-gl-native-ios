@@ -895,10 +895,7 @@ public:
     }
     
     if (! automaticallyAdjustContentInset) {
-        inset = UIEdgeInsetsMake(self.contentInset.top - self.safeMapViewContentInsets.top,
-                                 self.contentInset.left - self.safeMapViewContentInsets.left,
-                                 self.contentInset.bottom - self.safeMapViewContentInsets.bottom,
-                                 self.contentInset.right - self.safeMapViewContentInsets.right);
+        inset = self.contentInset;
         
         // makes sure the insets don't have negative values that could hide the ornaments
         // thus violating our ToS
@@ -943,8 +940,8 @@ public:
 
 - (void)installConstraints
 {
-    [self installCompassViewConstraints];
     [self installScaleBarConstraints];
+    [self installCompassViewConstraints];
     [self installLogoViewConstraints];
     [self installAttributionButtonConstraints];
 }

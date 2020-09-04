@@ -78,24 +78,34 @@
 
 - (void)testContentInsetOrnaments {
     CGFloat margin = 8;
+    CGFloat top = 8;
+    CGFloat bottom = 8;
+    
     self.mapView.contentInset = UIEdgeInsetsZero;
     UIView *scaleBar = self.mapView.scaleBar;
-    CGPoint expectedScaleBarOrigin = CGPointMake(margin, margin);
+    
+    if (@available(iOS 11.0, *)) {
+        UIEdgeInsets safeInsets = self.mapView.safeAreaInsets;
+        top += safeInsets.top;
+        bottom += safeInsets.bottom;
+    }
+    
+    CGPoint expectedScaleBarOrigin = CGPointMake(margin, top);
     XCTAssertTrue(CGPointEqualToPoint(scaleBar.frame.origin, expectedScaleBarOrigin));
     
     UIView *compassView = self.mapView.compassView;
     CGFloat x = self.screenBounds.size.width - compassView.bounds.size.width - margin;
-    CGPoint expectedCompassOrigin = CGPointMake(x, margin);
+    CGPoint expectedCompassOrigin = CGPointMake(x, top);
     XCTAssertTrue(CGPointEqualToPoint(compassView.frame.origin, expectedCompassOrigin));
                   
     UIView *logoView = self.mapView.logoView;
-    CGFloat y = self.screenBounds.size.height - logoView.bounds.size.height - margin;
+    CGFloat y = self.screenBounds.size.height - logoView.bounds.size.height - bottom;
     CGPoint expectedLogoOrigin = CGPointMake(margin, y);
     XCTAssertTrue(CGPointEqualToPoint(logoView.frame.origin, expectedLogoOrigin));
     
     UIView *attributionView = self.mapView.attributionButton;
     x = self.screenBounds.size.width - attributionView.bounds.size.width - margin;
-    y = self.screenBounds.size.height - attributionView.bounds.size.height - margin;
+    y = self.screenBounds.size.height - attributionView.bounds.size.height - bottom;
     CGPoint expectedAttributionOrigin = CGPointMake(x, y);
     XCTAssertTrue(CGPointEqualToPoint(attributionView.frame.origin, expectedAttributionOrigin));
     
@@ -106,11 +116,11 @@
     [self.mapView setNeedsLayout];
     [self.mapView layoutIfNeeded];
     
-    expectedScaleBarOrigin = CGPointMake(insets.left + self.mapView.scaleBarMargins.x, insets.top  + self.mapView.scaleBarMargins.y);
+    expectedScaleBarOrigin = CGPointMake(insets.left + self.mapView.scaleBarMargins.x, insets.top  + top);
     XCTAssertTrue(CGPointEqualToPoint(scaleBar.frame.origin, expectedScaleBarOrigin));
     
     x = self.screenBounds.size.width - compassView.bounds.size.width - insets.right - self.mapView.compassViewMargins.x;
-    expectedCompassOrigin = CGPointMake(x, insets.top + self.mapView.compassViewMargins.y);
+    expectedCompassOrigin = CGPointMake(x, insets.top + top);
     XCTAssertTrue(CGPointEqualToPoint(compassView.frame.origin, expectedCompassOrigin));
     
     y = self.screenBounds.size.height - logoView.bounds.size.height - insets.bottom - self.mapView.logoViewMargins.y;
